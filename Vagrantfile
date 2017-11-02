@@ -1,6 +1,6 @@
 static_ip = "172.16.0.8"
 
-ingress_nginx = "---
+ingress_nginx_service = "---
 apiVersion: v1
 kind: Service
 metadata:
@@ -58,8 +58,8 @@ spec:
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
   config.vm.provider "virtualbox" do |v|
-		v.memory = 2048
-		v.cpus = 2
+	v.memory = 2048
+	v.cpus = 2
   end
   config.vm.define "k8s" do |k8s|
 	k8s.vm.hostname = "k8s"
@@ -89,7 +89,7 @@ Vagrant.configure("2") do |config|
 		kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/udp-services-configmap.yaml
 		kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/rbac.yaml
 		kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/with-rbac.yaml
-		echo "#{ingress_nginx}" | kubectl apply -f -
+		echo "#{ingress_nginx_service}" | kubectl apply -f -
 		# Install Heapster for metrics
 		kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/rbac/heapster-rbac.yaml
 		kubectl apply -f https://raw.githubusercontent.com/kubernetes/heapster/master/deploy/kube-config/standalone/heapster-controller.yaml
