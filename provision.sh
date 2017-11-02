@@ -2,19 +2,31 @@
 set -euo pipefail
 
 echo '### Adding repositories ###'
+export DEBIAN_FRONTEND=noninteractive
+apt-get update && apt-get install -y apt-transport-https curl
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 echo "deb https://download.docker.com/linux/$(lsb_release -si | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
 
 echo '### Install docker and kubernetes ###'
-export DEBIAN_FRONTEND=noninteractive
 apt-get update && apt-get install -y kubelet kubeadm kubectl docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}')
+
+echo '### Disable swap ###'
+sed -i -e '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+swapoff -a
 
 echo '### Initializing the cluster ###'
 kubeadm init --apiserver-advertise-address=$STATIC_IP --pod-network-cidr=192.168.0.0/16
 export KUBECONFIG=/etc/kubernetes/admin.conf
-echo Install Calico networking
+
+echo '### Setting up the user environment ###'
+chmod +r /etc/kubernetes/admin.conf
+echo "export KUBECONFIG=/etc/kubernetes/admin.conf" > /etc/profile.d/kube.sh
+echo "source <(kubectl completion bash)" >> /etc/profile.d/kube.sh
+echo "alias docker='sudo /usr/bin/docker'" > /etc/profile.d/docker.sh
+
+echo '### Install Calico networking ###'
 kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
 kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 
@@ -89,10 +101,3 @@ spec:
   - $STATIC_IP
 EOF
 echo ">>> Dashboard on http://$STATIC_IP:9090 <<<"
-
-echo '### Setting up the user environment ###'
-mkdir -p /home/ubuntu/.kube
-cp $KUBECONFIG /home/ubuntu/.kube/config
-chown ubuntu:ubuntu /home/ubuntu/.kube/config
-echo 'source <(kubectl completion bash)' >> /home/ubuntu/.bashrc
-adduser ubuntu docker > /dev/null
