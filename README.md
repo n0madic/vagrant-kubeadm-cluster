@@ -1,8 +1,12 @@
 # vagrant-kubeadm-cluster
-Ready to use single-host kubernetes cluster deployed in Vagrant using kubeadm with dashboard and ingress proxy.
-Alternative to Minikube.
 
-Usage:
+Summary
+-------
+Ready to use single-host kubernetes cluster deployed in Vagrant using kubeadm, include dashboard and ingress proxy.
+Alternative to [Minikube](https://github.com/kubernetes/minikube).
+
+Usage
+-----
 ```
 $ git clone https://github.com/n0madic/vagrant-kubeadm-cluster.git
 $ cd vagrant-kubeadm-cluster
