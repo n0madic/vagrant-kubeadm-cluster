@@ -16,6 +16,11 @@ echo '### Disable swap ###'
 sed -i -e '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 swapoff -a
 
+if [[ "$SKIP_INIT" -eq 1 ]]; then
+  echo 'SKIP cluster initialization!'
+  exit;
+fi
+
 echo '### Initializing the cluster ###'
 kubeadm init --apiserver-advertise-address=$STATIC_IP --pod-network-cidr=192.168.0.0/16
 export KUBECONFIG=/etc/kubernetes/admin.conf
@@ -27,8 +32,8 @@ echo "source <(kubectl completion bash)" >> /etc/profile.d/kube.sh
 echo "alias docker='sudo /usr/bin/docker'" > /etc/profile.d/docker.sh
 
 echo '### Install Calico networking ###'
-kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
-kubectl apply -f https://docs.projectcalico.org/v2.6/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 
 echo '### Untaint master ###'
 kubectl taint nodes --all node-role.kubernetes.io/master-
@@ -100,4 +105,5 @@ spec:
   externalIPs:
   - $STATIC_IP
 EOF
+kubectl wait --for=condition=available -n kube-system deployment/kubernetes-dashboard
 echo ">>> Dashboard on http://$STATIC_IP:9090 <<<"
