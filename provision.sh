@@ -105,5 +105,5 @@ spec:
   externalIPs:
   - $STATIC_IP
 EOF
-kubectl wait --for=condition=available -n kube-system deployment/kubernetes-dashboard
+kubectl wait --timeout=60s --for=condition=available -n kube-system deployment/kubernetes-dashboard
 echo ">>> Dashboard on http://$STATIC_IP:9090 <<<"
