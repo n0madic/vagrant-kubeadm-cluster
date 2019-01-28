@@ -15,7 +15,10 @@ Vagrant.configure("2") do |config|
 		shell.env = {
 			"STATIC_IP" => static_ip,
 			"KUBE_VERSION" => ENV['KUBE_VERSION'],
-			"SKIP_INIT" => ENV['SKIP_INIT']
+			"SKIP_INIT" => ENV['SKIP_INIT'],
+			"SKIP_CNI" => ENV['SKIP_CNI'],
+			"SKIP_INGRESS" => ENV['SKIP_INGRESS'],
+			"SKIP_DASHBOARD" => ENV['SKIP_DASHBOARD']
 		}
 	end
   end
