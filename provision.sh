@@ -38,14 +38,14 @@ if [[ "$SKIP_CNI" -eq 1 ]]; then
   echo 'SKIP CNI network installing!'
 else
   echo '### Install Calico networking ###'
-  kubectl apply -f https://docs.projectcalico.org/v3.5/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+  kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
 fi
 
 if [[ "$SKIP_INGRESS" -eq 1 ]]; then
   echo 'SKIP ingress installing!'
 else
   echo '### Install nginx ingress proxy ###'
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
 cat <<EOF | kubectl create -f -
   apiVersion: v1
   kind: Service
