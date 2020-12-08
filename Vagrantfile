@@ -10,6 +10,8 @@ Vagrant.configure('2') do |config|
   config.vm.define 'k8s' do |k8s|
     k8s.vm.hostname = 'k8s'
     k8s.vm.network 'private_network', ip: static_ip
+    k8s.vm.network "forwarded_port", guest_ip: static_ip, guest: 80, host: 8080
+    k8s.vm.network "forwarded_port", guest_ip: static_ip, guest: 443, host: 8443
     k8s.vm.provision 'shell' do |shell|
       shell.path = 'provision.sh'
       shell.env = {
